@@ -5,6 +5,21 @@ and Codex usage from local CLI logs. It turns local usage files into dashboards,
 cost estimates, rate-window hints, project breakdowns, model breakdowns, and
 practical tips for working more efficiently with coding agents.
 
+## Screenshots
+
+### macOS Dashboard
+
+![AI Buddies macOS dashboard](AIBuddies/fastlane/screenshots/mac/en-US/01_dashboard.png)
+
+### iOS Companion
+
+<p>
+  <img src="AIBuddies/fastlane/screenshots/ios/en-US/01_home.png" alt="AI Buddies iOS home" width="220">
+  <img src="AIBuddies/fastlane/screenshots/ios/en-US/02_trends.png" alt="AI Buddies iOS trends" width="220">
+  <img src="AIBuddies/fastlane/screenshots/ios/en-US/03_tips.png" alt="AI Buddies iOS tips" width="220">
+  <img src="AIBuddies/fastlane/screenshots/ios/en-US/04_settings.png" alt="AI Buddies iOS settings" width="220">
+</p>
+
 ## What It Does
 
 - Parses local Claude Code and Codex usage files on macOS.
@@ -74,6 +89,15 @@ Do not commit:
 
 The project is designed to work from local files and private CloudKit data.
 Treat any real usage snapshot as private.
+
+## Try The Tools
+
+AI Buddies is built for developers who actively use Claude Code and Codex.
+Referral offers vary by account, plan, region, and active promotion. Replace
+these placeholders with your own eligible referral links before sharing:
+
+- Claude Code: `ADD_YOUR_CLAUDE_REFERRAL_LINK`
+- Codex: `ADD_YOUR_CODEX_REFERRAL_LINK`
 
 ## License
 

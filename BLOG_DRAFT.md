@@ -8,6 +8,21 @@ That is why I built **AI Buddies**, an open-source macOS and iOS app that reads
 local Claude Code and Codex usage data, turns it into a dashboard, and helps
 developers build better habits with coding agents.
 
+## What It Looks Like
+
+The macOS app gives you the full operating view:
+
+![AI Buddies macOS dashboard](AIBuddies/fastlane/screenshots/mac/en-US/01_dashboard.png)
+
+The iOS app makes the same usage signal easy to check away from the Mac:
+
+<p>
+  <img src="AIBuddies/fastlane/screenshots/ios/en-US/01_home.png" alt="AI Buddies iOS home" width="220">
+  <img src="AIBuddies/fastlane/screenshots/ios/en-US/02_trends.png" alt="AI Buddies iOS trends" width="220">
+  <img src="AIBuddies/fastlane/screenshots/ios/en-US/03_tips.png" alt="AI Buddies iOS tips" width="220">
+  <img src="AIBuddies/fastlane/screenshots/ios/en-US/04_settings.png" alt="AI Buddies iOS settings" width="220">
+</p>
+
 ## Why This Matters
 
 Claude Code and Codex are strongest when you treat them like engineering
@@ -50,6 +65,10 @@ If you have not tried them yet, I strongly recommend using both:
 
 - Claude Code: [ADD YOUR CLAUDE REFERRAL LINK]
 - Codex: [ADD YOUR CODEX REFERRAL LINK]
+
+Referral offers vary by account, plan, workspace, region, and active promotion.
+Use the links above only after replacing them with your own eligible referral
+links, and disclose that you may receive credits or benefits if readers sign up.
 
 Use them on a real project, not just a toy prompt. Ask them to read your repo,
 write a small feature, add tests, review the diff, and explain the tradeoffs.
