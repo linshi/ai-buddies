@@ -59,7 +59,7 @@ That is where the value becomes obvious.
 
 AI Buddies is open source here:
 
-[ADD GITHUB REPO URL AFTER PUSH]
+https://github.com/linshi/ai-buddies
 
 The repo includes the macOS app, iOS app, widgets, shared Swift package, docs,
 and App Store submission guidance. If you build something useful on top of it,
