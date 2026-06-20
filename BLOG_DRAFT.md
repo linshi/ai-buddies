@@ -63,7 +63,7 @@ App Store metadata, and keep the release process auditable.
 
 If you have not tried them yet, I strongly recommend using both:
 
-- Claude Code: [ADD YOUR CLAUDE REFERRAL LINK]
+- Claude Code: https://claude.ai/referral/niwdS7st7A
 - Codex: [ADD YOUR CODEX REFERRAL LINK]
 
 Referral offers vary by account, plan, workspace, region, and active promotion.

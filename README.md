@@ -96,7 +96,7 @@ AI Buddies is built for developers who actively use Claude Code and Codex.
 Referral offers vary by account, plan, region, and active promotion. Replace
 these placeholders with your own eligible referral links before sharing:
 
-- Claude Code: `ADD_YOUR_CLAUDE_REFERRAL_LINK`
+- Claude Code: https://claude.ai/referral/niwdS7st7A
 - Codex: `ADD_YOUR_CODEX_REFERRAL_LINK`
 
 ## License
