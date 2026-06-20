@@ -1,0 +1,125 @@
+# AI Buddies — fastlane lanes for building and shipping the Mac + iOS apps.
+#
+# Prerequisites (one-time, require the Apple Developer Team ID — see SUBMISSION.md):
+#   1. Set DEVELOPMENT_TEAM in ../Config.xcconfig
+#   2. Create the App Store Connect app records for both bundle ids
+#   3. Create the CloudKit container + App Group in the developer portal
+#   4. `xcodegen generate` (project is generated, not committed)
+#
+# These lanes assume code signing is configured (automatic signing in Xcode, or
+# match/api-key for CI). Run from the AIBuddies/ directory: `fastlane ios beta` etc.
+
+default_platform(:ios)
+
+IOS_BUNDLE = ENV.fetch("FASTLANE_APP_IDENTIFIER", "com.example.aibuddies")
+MAC_BUNDLE = IOS_BUNDLE
+PROJECT    = "AIBuddies.xcodeproj"
+
+def asc_api_key
+  key_id = ENV.fetch("ASC_KEY_ID")
+  issuer_id = ENV.fetch("ASC_ISSUER_ID")
+  key_filepath = File.expand_path(
+    ENV.fetch("ASC_KEY_FILEPATH", "~/.appstoreconnect/private_keys/AuthKey_#{key_id}.p8")
+  )
+
+  unless File.file?(key_filepath)
+    UI.user_error!("Missing App Store Connect API private key at #{key_filepath}. Run Scripts/install_asc_api_key.sh or set ASC_KEY_FILEPATH.")
+  end
+
+  app_store_connect_api_key(
+    key_id: key_id,
+    issuer_id: issuer_id,
+    key_filepath: key_filepath,
+    duration: 1200
+  )
+end
+
+platform :ios do
+  desc "Run the UsageCore test suite"
+  lane :test do
+    sh("cd ../Packages/UsageCore && swift test")
+  end
+
+  desc "Build & upload the iOS app to TestFlight"
+  lane :beta do
+    build_app(project: PROJECT, scheme: "AIBuddiesiOS",
+              export_method: "app-store", output_directory: "build")
+    upload_to_testflight(skip_waiting_for_build_processing: true)
+  end
+
+  desc "Upload iOS metadata + screenshots (no binary) for review prep"
+  lane :metadata do
+    api_key = asc_api_key
+    deliver(
+      api_key: api_key,
+      app_identifier: IOS_BUNDLE,
+      app_version: "1.0",
+      build_number: "1",
+      metadata_path: "./fastlane/metadata/ios",
+      screenshots_path: "./fastlane/screenshots/ios",
+      skip_binary_upload: true,
+      submit_for_review: false,
+      sync_screenshots: true,
+      force: true,
+      run_precheck_before_submit: false
+    )
+  end
+
+  desc "Full iOS App Store release (build + upload + metadata)"
+  lane :release do
+    api_key = asc_api_key
+    build_app(project: PROJECT, scheme: "AIBuddiesiOS", export_method: "app-store", output_directory: "build")
+    deliver(
+      api_key: api_key,
+      app_identifier: IOS_BUNDLE,
+      metadata_path: "./fastlane/metadata/ios",
+      screenshots_path: "./fastlane/screenshots/ios",
+      submit_for_review: false,
+      sync_screenshots: true,
+      force: true
+    )
+  end
+end
+
+platform :mac do
+  desc "Build & upload the Mac app to TestFlight / App Store Connect"
+  lane :beta do
+    build_mac_app(project: PROJECT, scheme: "AIBuddiesMac",
+                  export_method: "app-store", output_directory: "build")
+    upload_to_testflight(skip_waiting_for_build_processing: true)
+  end
+
+  desc "Upload Mac metadata + screenshots (no binary)"
+  lane :metadata do
+    api_key = asc_api_key
+    deliver(
+      api_key: api_key,
+      app_identifier: MAC_BUNDLE,
+      platform: "osx",
+      app_version: "1.0",
+      build_number: "1",
+      metadata_path: "./fastlane/metadata/mac",
+      screenshots_path: "./fastlane/screenshots/mac",
+      skip_binary_upload: true,
+      submit_for_review: false,
+      sync_screenshots: true,
+      force: true,
+      run_precheck_before_submit: false
+    )
+  end
+
+  desc "Full Mac App Store release"
+  lane :release do
+    api_key = asc_api_key
+    build_mac_app(project: PROJECT, scheme: "AIBuddiesMac", export_method: "app-store", output_directory: "build")
+    deliver(
+      api_key: api_key,
+      app_identifier: MAC_BUNDLE, platform: "osx",
+      metadata_path: "./fastlane/metadata/mac",
+      screenshots_path: "./fastlane/screenshots/mac",
+      submit_for_review: false,
+      sync_screenshots: true,
+      force: true
+    )
+  end
+end

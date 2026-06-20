@@ -1,0 +1,434 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Buddies — 交互原型</title>
+<style>
+:root{
+  --bg:#ffffff;--bg2:#f6f5f0;--bg3:#eceae2;--text:#201f1d;--text2:#5f5e5a;--text3:#8d8c83;
+  --border:#e7e5dd;--border2:#d6d4ca;
+  --info-bg:#e6f1fb;--info:#185fa5;--warn-bg:#faeeda;--warn:#854f0b;--danger-bg:#fcebeb;--danger:#a32d2d;--success-bg:#eaf3de;--success:#3b6d11;
+  --claude:#d85a30;--claude-d:#993c1d;--codex:#0f6e56;--codex-l:#1d9e75;
+  --green:#1d9e75;--amber:#ba7517;--red:#e24b4a;--radius:8px;--radius-lg:12px;
+  --font:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Segoe UI",system-ui,sans-serif;
+}
+[data-theme="dark"]{
+  --bg:#1e1d1b;--bg2:#272623;--bg3:#302e2a;--text:#f2f1ec;--text2:#b4b2a9;--text3:#8d8c83;
+  --border:#3a3833;--border2:#4a4843;
+  --info-bg:#0c2236;--info:#85b7eb;--warn-bg:#3a2a0e;--warn:#fac775;--danger-bg:#3a1414;--danger:#f09595;--success-bg:#1a2a0c;--success:#c0dd97;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg3);color:var(--text);font-family:var(--font);line-height:1.5;font-size:15px;-webkit-font-smoothing:antialiased}
+.ic{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle}
+.ic svg{width:100%;height:100%;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.proto{position:sticky;top:0;z-index:50;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;padding:9px 16px;flex-wrap:wrap}
+.proto .brand{font-weight:500;display:flex;align-items:center;gap:8px}
+.proto .seg{display:flex;background:var(--bg3);border-radius:var(--radius);padding:3px;gap:2px}
+.proto .seg button{font-size:13px}
+.seg button{border:0;background:transparent;color:var(--text2);padding:5px 11px;border-radius:6px;cursor:pointer;font-family:var(--font)}
+.seg button.on{background:var(--bg);color:var(--text);font-weight:500;box-shadow:0 0 0 1px var(--border)}
+.btn{border:1px solid var(--border2);background:var(--bg);color:var(--text);padding:6px 12px;border-radius:var(--radius);cursor:pointer;font-family:var(--font);font-size:13px;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--bg2)}
+.btn:active{transform:scale(.98)}
+.btn.pri{border-color:var(--info);color:var(--info)}
+.iconbtn{border:0;background:transparent;color:var(--text2);cursor:pointer;padding:4px;border-radius:6px;display:inline-flex}
+.iconbtn:hover{background:var(--bg3);color:var(--text)}
+.wrap{max-width:1080px;margin:0 auto;padding:22px 16px 60px}
+.surface{margin-bottom:34px;scroll-margin-top:64px}
+.surface>h3{font-size:13px;font-weight:500;color:var(--text3);margin:0 0 10px;display:flex;align-items:center;gap:7px;text-transform:none}
+.card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:13px 15px}
+.muted{color:var(--text2)}
+.badge{font-size:11px;padding:1px 7px;border-radius:var(--radius);display:inline-flex;align-items:center;gap:3px;font-weight:500}
+.b-est{background:var(--bg3);color:var(--text2)}
+.b-auth{background:var(--success-bg);color:var(--success)}
+.b-danger{background:var(--danger-bg);color:var(--danger)}
+.b-warn{background:var(--warn-bg);color:var(--warn)}
+.b-info{background:var(--info-bg);color:var(--info)}
+.num{font-size:22px;font-weight:500;line-height:1.1}
+.track{flex:1;height:8px;background:var(--bg3);border-radius:var(--radius);overflow:hidden}
+.track>span{display:block;height:100%}
+.kpi{background:var(--bg2);border-radius:var(--radius);padding:11px 13px;cursor:pointer;border:1px solid transparent}
+.kpi:hover{border-color:var(--border2)}
+.kpi .l{font-size:12px;color:var(--text2)}
+.row{display:flex;align-items:center;gap:10px}
+/* menu bar */
+.menubar{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.menubar .top{display:flex;align-items:center;justify-content:flex-end;gap:14px;height:30px;padding:0 12px;background:var(--bg);border-bottom:1px solid var(--border);font-size:12.5px}
+.statusitem{display:flex;align-items:center;gap:6px;cursor:pointer;padding:3px 7px;border-radius:6px}
+.statusitem:hover{background:var(--bg2)}
+.desk{padding:14px;display:flex;justify-content:flex-end;min-height:30px;background:repeating-linear-gradient(0deg,var(--bg3),var(--bg3))}
+.dropdown{width:340px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;position:relative}
+.dd-sec{padding:12px 14px;border-bottom:1px solid var(--border)}
+.popover{position:absolute;top:42px;right:10px;width:250px;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:12px;z-index:5}
+/* window */
+.window{border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;background:var(--bg)}
+.titlebar{display:flex;align-items:center;gap:8px;height:34px;padding:0 12px;background:var(--bg2);border-bottom:1px solid var(--border)}
+.dot{width:11px;height:11px;border-radius:50%}
+.win-body{display:flex;min-height:380px}
+.sidebar{width:140px;border-right:1px solid var(--border);padding:10px 8px;display:flex;flex-direction:column;gap:2px;background:var(--bg2)}
+.navitem{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:var(--radius);cursor:pointer;font-size:13.5px;color:var(--text2);border:0;background:transparent;width:100%;text-align:left;font-family:var(--font)}
+.navitem:hover{background:var(--bg3)}
+.navitem.on{background:var(--info-bg);color:var(--info);font-weight:500}
+.main{flex:1;padding:15px;min-width:0}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.bars{display:flex;align-items:flex-end;gap:5px;height:100px}
+.bars>div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;cursor:default}
+.mrow{display:flex;align-items:center;gap:9px;font-size:12.5px;padding:3px 0}
+.mrow .nm{width:140px;color:var(--text2)}
+.listrow{display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid var(--border);cursor:pointer}
+.listrow:hover{background:var(--bg2)}
+.tip{display:flex;gap:9px;align-items:flex-start;font-size:13px;padding:3px 0}
+/* phone */
+.phone{width:288px;border:1px solid var(--border2);border-radius:30px;background:var(--bg);overflow:hidden;box-shadow:0 0 0 1px var(--border)}
+.statusbar{display:flex;justify-content:space-between;align-items:center;padding:9px 20px 3px;font-size:12px}
+.island{width:78px;height:17px;background:var(--text);opacity:.9;border-radius:10px}
+.ios-body{padding:6px 16px 0}
+.tabbar{display:flex;justify-content:space-around;padding:9px 0 12px;margin-top:10px;border-top:1px solid var(--border)}
+.tabitem{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--text3);cursor:pointer;border:0;background:transparent;font-family:var(--font)}
+.tabitem.on{color:var(--info)}
+.widget{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:12px;cursor:pointer}
+.homescreen{background:var(--bg3);border-radius:var(--radius-lg);padding:18px;display:flex;gap:18px;flex-wrap:wrap}
+select,input[type=number]{font-family:var(--font);font-size:13px;padding:6px 8px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text)}
+.field{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:13.5px}
+.hint{font-size:12px;color:var(--text3)}
+@media(max-width:680px){.grid4{grid-template-columns:repeat(2,1fr)}.sidebar{width:118px}.mrow .nm{width:96px}}
+</style>
+
+<div class="proto">
+  <span class="brand"><span class="ic" style="width:20px;height:20px;color:var(--claude)" data-i="robot"></span>AI Buddies <span class="hint">交互原型</span></span>
+  <div class="seg" style="margin-left:4px">
+    <button data-act="nav" data-arg="s-menubar" class="on">Mac 菜单栏</button>
+    <button data-act="nav" data-arg="s-dashboard">Mac 仪表盘</button>
+    <button data-act="nav" data-arg="s-ios">iOS</button>
+  </div>
+  <button class="btn" data-act="theme" style="margin-left:auto"><span class="ic" style="width:16px;height:16px" data-i="bulb"></span><span id="themelbl">深色</span></button>
+  <span class="hint">数据为示例 · 点任意按钮试试</span>
+</div>
+
+<div class="wrap">
+  <section class="surface" id="s-menubar">
+    <h3><span class="ic" style="width:15px;height:15px" data-i="gauge"></span> macOS · 菜单栏（点状态项开关下拉）</h3>
+    <div class="menubar">
+      <div class="top">
+        <div class="statusitem" data-act="mb-toggle" id="mb-status"></div>
+        <span class="muted ic" style="width:15px;height:15px" data-i="clock"></span><span class="muted">9:41</span>
+      </div>
+      <div class="desk"><div id="mb-dropdown"></div></div>
+    </div>
+  </section>
+
+  <section class="surface" id="s-dashboard">
+    <h3><span class="ic" style="width:15px;height:15px" data-i="window"></span> macOS · 仪表盘窗口（点左侧导航切换）</h3>
+    <div class="window">
+      <div class="titlebar">
+        <span class="dot" style="background:#e24b4a"></span><span class="dot" style="background:#ef9f27"></span><span class="dot" style="background:#1d9e75"></span>
+        <span class="muted" style="margin:0 auto;font-size:12.5px" id="dash-title">AI Buddies — 概览</span>
+      </div>
+      <div class="win-body">
+        <div class="sidebar" id="dash-nav"></div>
+        <div class="main" id="dash-main"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="surface" id="s-ios">
+    <h3><span class="ic" style="width:15px;height:15px" data-i="mobile"></span> iOS · App（点底部标签切换）+ 小组件</h3>
+    <div class="homescreen">
+      <div class="phone">
+        <div class="statusbar"><span style="font-weight:500">9:41</span><span class="island"></span><span class="muted">100%</span></div>
+        <div class="ios-body" id="ios-screen"></div>
+        <div class="tabbar" id="ios-tabs"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <h3 style="margin:0"><span class="ic" style="width:15px;height:15px" data-i="grid"></span> 主屏小组件（点开 App）</h3>
+        <div id="widgets" style="display:flex;gap:12px;flex-wrap:wrap"></div>
+        <h3 style="margin:4px 0 0"><span class="ic" style="width:15px;height:15px" data-i="lock"></span> 锁屏 / Watch</h3>
+        <div id="lockwidgets" class="row" style="gap:14px"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const ICONS={
+ robot:'<rect x="5" y="8" width="14" height="11" rx="2"/><path d="M12 4v4"/><circle cx="12" cy="4" r="1"/><path d="M9.5 13v1.5M14.5 13v1.5"/>',
+ gauge:'<path d="M4 18a8 8 0 1 1 16 0"/><path d="M12 18l4-5"/>',
+ window:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18"/>',
+ mobile:'<rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/>',
+ grid:'<rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/>',
+ lock:'<rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+ clock:'<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>',
+ refresh:'<path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/>',
+ settings:'<path d="M4 6h8"/><circle cx="15" cy="6" r="2"/><path d="M18 6h2"/><path d="M4 12h2"/><circle cx="9" cy="12" r="2"/><path d="M12 12h8"/><path d="M4 18h8"/><circle cx="15" cy="18" r="2"/><path d="M18 18h2"/>',
+ close:'<path d="M6 6l12 12M18 6L6 18"/>',
+ chevR:'<path d="M9 6l6 6-6 6"/>',
+ bulb:'<path d="M9.5 18h5"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 1 4 10.5c-.6.6-1 1.4-1 2.5H9c0-1.1-.4-1.9-1-2.5A6 6 0 0 1 12 3z"/>',
+ alert:'<path d="M12 4l9 16H3z"/><path d="M12 10v4"/><path d="M12 17h.01"/>',
+ home:'<path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/>',
+ chart:'<path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M21 20H3"/>',
+ dash:'<rect x="4" y="4" width="7" height="9" rx="1"/><rect x="13" y="4" width="7" height="5" rx="1"/><rect x="13" y="12" width="7" height="8" rx="1"/><rect x="4" y="16" width="7" height="4" rx="1"/>',
+ spark:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>',
+ code:'<path d="M9 8l-4 4 4 4"/><path d="M15 8l4 4-4 4"/>',
+ folder:'<path d="M3 7a1 1 0 0 1 1-1h5l2 2h8a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/>',
+ cpu:'<rect x="6" y="6" width="12" height="12" rx="1"/><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"/>',
+ check:'<path d="M5 12l4 4 10-11"/>',
+ dollar:'<path d="M12 3v18"/><path d="M16 7a4 3 0 0 0-4-2c-2 0-4 1-4 3s2 2.5 4 3 4 1 4 3-2 3-4 3a4 3 0 0 1-4-2"/>'
+};
+function ico(n,size,color){return '<span class="ic" style="width:'+(size||16)+'px;height:'+(size||16)+'px'+(color?';color:'+color:'')+'"><svg viewBox="0 0 24 24">'+(ICONS[n]||'')+'</svg></span>';}
+
+function lvlColor(p){return p>=90?'var(--red)':p>=70?'var(--amber)':'var(--green)';}
+function ring(p,size,sub){
+ size=size||44;var c=lvlColor(p);
+ var t=Math.round(p);
+ return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 36 36"><circle cx="18" cy="18" r="16" fill="none" stroke="var(--border2)" stroke-width="3.4"/><circle cx="18" cy="18" r="16" fill="none" stroke="'+c+'" stroke-width="3.4" stroke-linecap="round" pathLength="100" stroke-dasharray="'+t+' 100" transform="rotate(-90 18 18)"/><text x="18" y="'+(sub?16:19.6)+'" text-anchor="middle" style="font-size:9.5px;font-weight:500;fill:var(--text)">'+t+'%</text>'+(sub?'<text x="18" y="24" text-anchor="middle" style="font-size:6.5px;fill:var(--text2)">'+sub+'</text>':'')+'</svg>';
+}
+function usd(n){return '$'+n.toFixed(2);}
+function usd0(n){return '$'+Math.round(n);}
+function tok(n){return n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(1)+'k':String(n);}
+
+const DATA={
+ claude:{today:5.10,week:74.5,w5h:72,wWeek:58,wWeekReset:'5 天',tokens:{in:1100000,out:600000,cr:41000000,cw:4500000},calls:1284,
+   sessions:[['myapp-api','opus',18.2],['web-frontend','sonnet',9.6],['infra','sonnet',5.1]]},
+ codex:{today:1.30,week:11.9,w5h:86,w5hReset:'58 分',wWeek:41,wWeekReset:'4.6 天',tokens:{in:700000,out:300000,cr:50000},sessions:1,
+   sess:[['rollout-9af2…','gpt-5-codex',6.4],['rollout-1c7d…','gpt-5-codex',3.1],['rollout-77b0…','gpt-5-codex',2.4]]},
+ daily:[[3,1],[5,1.5],[2,.5],[6,2],[4,1],[7,1.5],[5,1],[8,2],[4,1.5],[6,1],[9,2],[5,1],[7,1.5],[6,1.3]],
+ models:[['claude / sonnet','claude',41.0,30000000],['claude / opus','claude',33.5,14000000],['codex / gpt-5-codex','codex',11.9,1050000]],
+ projects:[['myapp-api','claude',38,21000000,['opus','sonnet']],['web-frontend','claude',22,15000000,['sonnet']],['infra','claude',14,9000000,['sonnet']],['scripts','codex',9,800000,['gpt-5-codex']],['docs','claude',3.4,2200000,['haiku']]],
+ tips:[
+  {k:'danger',c:'防限流',t:'Codex 5 小时额度已用 86%，约 58 分钟后重置 — 先合并 / 暂缓重任务。'},
+  {k:'warn',c:'省钱',t:'12 次 Opus 调用输出很短（小任务）。这类任务换 Sonnet / Haiku，成本可降约 5×。'},
+  {k:'warn',c:'省钱',t:'Claude 缓存读取占比仅 22%。固定 CLAUDE.md、复用稳定上下文可大幅省输入成本。'},
+  {k:'info',c:'价值',t:'本周 Claude 等效用量 ≈ $74.5（折月 ≈ $319），约为 $200 订阅的 1.6× 价值。'},
+  {k:'success',c:'做得好',t:'Codex 每周额度才用 41%，节奏健康，关键任务有余量。'}
+ ],
+ plan:{claudeTier:'Max 20x ($200)',codexTier:'Pro'},
+};
+const state={theme:(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light',
+ ddOpen:true,popover:false,menubarShow:'pct',dashPanel:'overview',range:14,project:null,iosScreen:'home',iosPeriod:'today'};
+
+/* ---------- menu bar ---------- */
+function renderStatus(){
+ var c=DATA.claude.w5h,x=DATA.codex.w5h;
+ var s=state.menubarShow;
+ var txt = s==='pct'
+   ? '<span style="color:var(--text)">C '+c+'%</span> · <span style="color:var(--text)">X '+x+'%</span>'
+   : '<span style="color:var(--text)">今日 '+usd(DATA.claude.today+DATA.codex.today)+'</span>';
+ var warn = (c>=90||x>=90)?ico('alert',15,'var(--red)'):(c>=70||x>=70)?ico('alert',15,'var(--amber)'):'';
+ document.getElementById('mb-status').innerHTML=ico('gauge',15,'var(--text2)')+'<span style="font-size:12.5px">'+txt+'</span>'+warn;
+}
+function provBlock(prov){
+ var d=DATA[prov],isC=prov==='claude';
+ var name=isC?'Claude Code':'Codex',color=isC?'var(--claude)':'var(--codex)';
+ var badge=isC?'<span class="badge b-est">估算</span>':'<span class="badge b-auth">'+ico('check',11)+'权威</span>';
+ var r1sub=isC?'~3.2k tok':(d.w5hReset+'后');
+ var r2sub=(d.wWeekReset+'后重置');
+ return '<div class="dd-sec" data-act="mb-prov" data-arg="'+prov+'" style="cursor:pointer">'
+  +'<div class="row" style="margin-bottom:10px"><span class="dot" style="width:8px;height:8px;background:'+color+'"></span><span style="font-weight:500">'+name+'</span>'+badge
+  +'<span class="muted" style="margin-left:auto;font-size:13px">今日 ≈ '+usd(d.today)+'</span></div>'
+  +'<div class="row" style="gap:18px">'
+   +'<div class="row" style="gap:8px">'+ring(d.w5h,44)+'<div style="font-size:12px"><div class="muted">5 小时</div><div class="muted">'+r1sub+'</div></div></div>'
+   +'<div class="row" style="gap:8px">'+ring(d.wWeek,44)+'<div style="font-size:12px"><div class="muted">每周</div><div class="muted">'+r2sub+'</div></div></div>'
+  +'</div></div>';
+}
+function renderDropdown(){
+ var el=document.getElementById('mb-dropdown');
+ if(!state.ddOpen){el.innerHTML='';return;}
+ var top=DATA.tips[0];
+ el.innerHTML='<div class="dropdown">'
+  +'<div class="dd-sec row" style="justify-content:space-between"><span class="row" style="font-weight:500;gap:7px">'+ico('robot',18,'var(--claude)')+' AI Buddies</span>'
+   +'<span class="row" style="gap:4px"><button class="iconbtn" data-act="mb-refresh" aria-label="刷新">'+ico('refresh',17)+'</button><button class="iconbtn" data-act="mb-settings" aria-label="设置">'+ico('settings',17)+'</button></span></div>'
+  +provBlock('claude')+provBlock('codex')
+  +'<div class="dd-sec" style="background:var(--warn-bg);display:flex;gap:8px;align-items:flex-start"><span style="color:var(--warn)">'+ico('bulb',16)+'</span><span style="font-size:12.5px;color:var(--warn)">'+top.t+'</span></div>'
+  +'<div class="dd-sec row" style="justify-content:space-between;border-bottom:0;cursor:pointer" data-act="mb-open"><span class="row" style="gap:6px;color:var(--info)">'+ico('dash',16)+'打开仪表盘</span><span class="muted" style="font-size:12px">⌘D <span id="mb-updated"></span></span></div>'
+  +(state.popover?popover():'')
+  +'</div>';
+ setUpdated();
+}
+function popover(){
+ return '<div class="popover"><div class="row" style="justify-content:space-between;margin-bottom:8px"><span style="font-weight:500;font-size:13px">设置</span><button class="iconbtn" data-act="mb-settings">'+ico('close',15)+'</button></div>'
+ +'<div style="font-size:12px" class="muted">菜单栏显示</div>'
+ +'<div class="seg" style="background:var(--bg3);margin:5px 0 10px"><button data-act="set-mb" data-arg="pct" class="'+(state.menubarShow==='pct'?'on':'')+'">额度 %</button><button data-act="set-mb" data-arg="cost" class="'+(state.menubarShow==='cost'?'on':'')+'">今日 $</button></div>'
+ +'<div class="field" style="border:0;padding:4px 0"><span>刷新间隔</span><select><option>1 分钟</option><option>5 分钟</option><option>10 分钟</option></select></div>'
+ +'<div class="hint">完整设置在仪表盘 · 设置页</div></div>';
+}
+function setUpdated(){var e=document.getElementById('mb-updated');if(e)e.textContent='· 刚刚';}
+
+/* ---------- dashboard ---------- */
+const NAV=[['overview','概览','dash'],['claude','Claude','spark'],['codex','Codex','code'],['projects','项目','folder'],['models','模型','cpu'],['tips','建议','bulb'],['settings','设置','settings']];
+function renderNav(){
+ document.getElementById('dash-nav').innerHTML=NAV.map(function(n,i){
+  var sp=i===6?'margin-top:auto':'';
+  return '<button class="navitem '+(state.dashPanel===n[0]?'on':'')+'" style="'+sp+'" data-act="dash-panel" data-arg="'+n[0]+'">'+ico(n[2],17)+n[1]+'</button>';
+ }).join('');
+ var t={overview:'概览',claude:'Claude 明细',codex:'Codex 明细',projects:'项目',models:'模型',tips:'建议',settings:'设置'}[state.dashPanel];
+ document.getElementById('dash-title').textContent='AI Buddies — '+t;
+}
+function kpis(){
+ return '<div class="grid4" style="margin-bottom:14px">'
+ +'<div class="kpi" data-act="dash-panel" data-arg="tips"><div class="l">本周等效</div><div class="num">'+usd(DATA.claude.week+DATA.codex.week)+'</div><div style="font-size:11px;color:var(--success)">约 1.6× 订阅价值</div></div>'
+ +'<div class="kpi" data-act="dash-panel" data-arg="claude"><div class="l">Claude 5h 剩余</div><div class="num">'+(100-DATA.claude.w5h)+'%</div><div style="font-size:11px" class="muted">估算</div></div>'
+ +'<div class="kpi" data-act="dash-panel" data-arg="codex"><div class="l">Codex 每周剩余</div><div class="num">'+(100-DATA.codex.wWeek)+'%</div><div style="font-size:11px;color:var(--success)">权威</div></div>'
+ +'<div class="kpi" data-act="dash-panel" data-arg="models"><div class="l">本周 token</div><div class="num">48.2M</div><div style="font-size:11px" class="muted">两端合计</div></div>'
+ +'</div>';
+}
+function chartBars(){
+ var data=DATA.daily.slice(-state.range);
+ var max=0;data.forEach(function(d){max=Math.max(max,d[0]+d[1]);});
+ var bars=data.map(function(d){
+  var ch=Math.round(d[0]/max*88),cx=Math.round(d[1]/max*88);
+  return '<div title="Claude '+usd(d[0])+' · Codex '+usd(d[1])+'"><div style="height:'+ch+'px;background:var(--claude)"></div><div style="height:'+cx+'px;background:var(--codex)"></div></div>';
+ }).join('');
+ return '<div class="card" style="flex:1;min-width:280px"><div class="row" style="justify-content:space-between;margin-bottom:10px"><span style="font-size:13px;font-weight:500">每日等效费用</span>'
+ +'<span class="seg" style="background:var(--bg3)"><button data-act="dash-range" data-arg="7" class="'+(state.range==7?'on':'')+'">7</button><button data-act="dash-range" data-arg="14" class="'+(state.range==14?'on':'')+'">14</button><button data-act="dash-range" data-arg="30" class="'+(state.range==30?'on':'')+'">30</button></span></div>'
+ +'<div class="row" style="font-size:11px;gap:12px;margin-bottom:6px"><span class="muted"><span style="display:inline-block;width:8px;height:8px;background:var(--claude);border-radius:2px;margin-right:3px"></span>Claude</span><span class="muted"><span style="display:inline-block;width:8px;height:8px;background:var(--codex);border-radius:2px;margin-right:3px"></span>Codex</span></div>'
+ +'<div class="bars">'+bars+'</div></div>';
+}
+function barList(items,colorFn){
+ var max=0;items.forEach(function(it){max=Math.max(max,it.v);});
+ return items.map(function(it){
+  return '<div class="mrow"><span class="nm">'+it.n+'</span><span class="track"><span style="width:'+Math.round(it.v/max*100)+'%;background:'+colorFn(it)+'"></span></span><span style="width:46px;text-align:right">'+it.r+'</span></div>';
+ }).join('');
+}
+function tipsHTML(list){
+ return list.map(function(t){
+  return '<div class="tip"><span class="badge b-'+t.k+'">'+t.c+'</span><span>'+t.t+'</span></div>';
+ }).join('');
+}
+function panelOverview(){
+ var models=DATA.models.map(function(m){return {n:m[0],v:m[2],r:usd0(m[2]),prov:m[1]};});
+ var projs=DATA.projects.slice(0,3).map(function(p){return {n:p[0],v:p[2],r:usd0(p[2])};});
+ return kpis()
+ +'<div style="display:flex;gap:14px;flex-wrap:wrap">'+chartBars()
+ +'<div class="card" style="flex:1;min-width:240px"><div style="font-size:13px;font-weight:500;margin-bottom:8px">按模型 · 等效费用</div>'+barList(models,function(it){return it.prov==='claude'?'var(--claude)':'var(--codex)';})
+ +'<div style="font-size:13px;font-weight:500;margin:12px 0 8px">Top 项目</div>'+barList(projs,function(){return 'var(--text3)';})+'</div></div>'
+ +'<div class="card" style="margin-top:14px"><div class="row" style="font-size:13px;font-weight:500;margin-bottom:8px;gap:6px">'+ico('bulb',16)+' 建议</div>'+tipsHTML(DATA.tips.slice(0,4))+'</div>';
+}
+function tokenTable(tk,approx){
+ var rows=[['输入',tk.in],['输出',tk.out],['缓存读取',tk.cr],['缓存写入',tk.cw]];
+ return rows.filter(function(r){return r[1]!=null;}).map(function(r){return '<div class="field"><span class="muted">'+r[0]+'</span><span>'+tok(r[1])+' tok</span></div>';}).join('');
+}
+function panelClaude(){
+ var d=DATA.claude;
+ return '<div style="display:flex;gap:14px;flex-wrap:wrap"><div class="card" style="flex:1;min-width:230px"><div class="row" style="margin-bottom:12px"><span class="dot" style="width:8px;height:8px;background:var(--claude)"></span><span style="font-weight:500">额度窗口</span><span class="badge b-est" style="margin-left:auto">估算</span></div>'
+ +'<div class="row" style="gap:24px;justify-content:center"><div style="text-align:center">'+ring(d.w5h,64)+'<div class="muted" style="font-size:12px;margin-top:4px">5 小时</div></div><div style="text-align:center">'+ring(d.wWeek,64)+'<div class="muted" style="font-size:12px;margin-top:4px">每周 · '+d.wWeekReset+'后</div></div></div>'
+ +'<div class="hint" style="margin-top:10px;text-align:center">官方剩余% 仅在 HTTP header，本地无法读取，此处为用量估算代理。</div></div>'
+ +'<div class="card" style="flex:1;min-width:230px"><div style="font-weight:500;margin-bottom:6px">本周用量</div><div class="num" style="margin-bottom:2px">'+usd(d.week)+'</div><div class="hint" style="margin-bottom:8px">等效 API 成本 · '+d.calls+' 次调用</div>'+tokenTable(d.tokens)+'</div></div>'
+ +'<div class="card" style="margin-top:14px"><div style="font-weight:500;margin-bottom:4px">最近会话</div>'+d.sessions.map(function(s){return '<div class="listrow" data-act="dash-project" data-arg="'+s[0]+'"><span style="flex:1">'+s[0]+'</span><span class="badge b-est">'+s[1]+'</span><span style="width:50px;text-align:right">'+usd0(s[2])+'</span>'+ico('chevR',15,'var(--text3)')+'</div>';}).join('')+'</div>';
+}
+function panelCodex(){
+ var d=DATA.codex;
+ return '<div style="display:flex;gap:14px;flex-wrap:wrap"><div class="card" style="flex:1;min-width:230px"><div class="row" style="margin-bottom:12px"><span class="dot" style="width:8px;height:8px;background:var(--codex)"></span><span style="font-weight:500">额度窗口</span><span class="badge b-auth" style="margin-left:auto">'+ico('check',11)+'权威</span></div>'
+ +'<div class="row" style="gap:24px;justify-content:center"><div style="text-align:center">'+ring(d.w5h,64)+'<div style="font-size:12px;margin-top:4px;color:var(--red)">5h · '+d.w5hReset+'后重置</div></div><div style="text-align:center">'+ring(d.wWeek,64)+'<div class="muted" style="font-size:12px;margin-top:4px">每周 · '+d.wWeekReset+'后</div></div></div>'
+ +'<div class="hint" style="margin-top:10px;text-align:center">读自 rollout 文件的 rate_limits（used_percent / resets_in_seconds），精确。</div></div>'
+ +'<div class="card" style="flex:1;min-width:230px"><div style="font-weight:500;margin-bottom:6px">本周用量</div><div class="num" style="margin-bottom:2px">'+usd(d.week)+' <span class="badge b-warn">价格近似</span></div><div class="hint" style="margin-bottom:8px">Codex 价格未官方核实，可在设置中修正</div>'+tokenTable({in:d.tokens.in,out:d.tokens.out,cr:d.tokens.cr})+'</div></div>'
+ +'<div class="card" style="margin-top:14px"><div style="font-weight:500;margin-bottom:4px">最近会话</div>'+d.sess.map(function(s){return '<div class="listrow"><span style="flex:1">'+s[0]+'</span><span class="badge b-auth">'+s[1]+'</span><span style="width:50px;text-align:right">'+usd0(s[2])+'</span></div>';}).join('')+'</div>';
+}
+function panelProjects(){
+ if(state.project){
+  var p=DATA.projects.filter(function(x){return x[0]===state.project;})[0];
+  if(p) return '<button class="btn" data-act="dash-back" style="margin-bottom:12px">‹ 返回项目</button>'
+   +'<div class="card"><div class="row" style="margin-bottom:10px">'+ico('folder',18,'var(--text2)')+'<span style="font-weight:500;font-size:16px">'+p[0]+'</span><span class="badge b-'+(p[1]==='claude'?'est':'auth')+'" style="margin-left:auto">'+p[1]+'</span></div>'
+   +'<div class="grid4" style="grid-template-columns:repeat(3,1fr)"><div class="kpi"><div class="l">等效费用</div><div class="num">'+usd0(p[2])+'</div></div><div class="kpi"><div class="l">Tokens</div><div class="num">'+tok(p[3])+'</div></div><div class="kpi"><div class="l">模型</div><div class="num" style="font-size:14px;padding-top:6px">'+p[4].join(', ')+'</div></div></div>'
+   +'<div class="hint" style="margin-top:10px">在真机里这里会列出该项目的会话、按天趋势、以及针对它的省钱建议。</div></div>';
+ }
+ var items=DATA.projects.map(function(p){return {n:p[0],v:p[2],r:usd0(p[2])};});
+ return '<div class="card"><div style="font-weight:500;margin-bottom:8px">所有项目 · 点击下钻</div>'
+ +DATA.projects.map(function(p){return '<div class="listrow" data-act="dash-project" data-arg="'+p[0]+'"><span style="flex:1">'+p[0]+'</span><span class="badge b-'+(p[1]==='claude'?'est':'auth')+'">'+p[1]+'</span><span class="track" style="max-width:120px"><span style="width:'+Math.round(p[2]/38*100)+'%;background:var(--text3)"></span></span><span style="width:46px;text-align:right">'+usd0(p[2])+'</span>'+ico('chevR',15,'var(--text3)')+'</div>';}).join('')+'</div>';
+}
+function panelModels(){
+ return '<div class="card"><div style="font-weight:500;margin-bottom:10px">按模型 · 本周</div>'
+ +DATA.models.map(function(m){return '<div class="mrow" style="padding:7px 0"><span class="nm" style="width:160px">'+m[0]+'</span><span class="track"><span style="width:'+Math.round(m[2]/41*100)+'%;background:'+(m[1]==='claude'?'var(--claude)':'var(--codex)')+'"></span></span><span style="width:120px;text-align:right" class="muted">'+tok(m[3])+' · '+usd0(m[2])+'</span></div>';}).join('')
+ +'<div class="hint" style="margin-top:10px">'+ico('bulb',13)+' 这周 Opus 占了 $33.5。把简单任务切到 Sonnet/Haiku 是最大的省钱点。</div></div>';
+}
+function panelTips(){
+ var groups={防限流:[],省钱:[],价值:[],'做得好':[]};
+ DATA.tips.forEach(function(t){(groups[t.c]||(groups[t.c]=[])).push(t);});
+ return '<div class="card"><div class="row" style="font-weight:500;margin-bottom:10px;gap:6px">'+ico('bulb',16)+' 全部建议（'+DATA.tips.length+'）</div>'+tipsHTML(DATA.tips)
+ +'<div class="hint" style="margin-top:12px">建议由规则引擎基于你的本地数据生成；阈值可在设置中调整。</div></div>';
+}
+function panelSettings(){
+ return '<div class="card"><div style="font-weight:500;margin-bottom:6px">套餐 & 计费</div>'
+ +'<div class="field"><span>Claude 套餐</span><select><option>Pro ($20)</option><option>Max 5x ($100)</option><option selected>Max 20x ($200)</option></select></div>'
+ +'<div class="field"><span>Codex 套餐</span><select><option>Plus</option><option selected>Pro</option></select></div>'
+ +'<div class="field"><span>月付价（价值倍数用）</span><input type="number" value="200" style="width:90px"></div>'
+ +'<div class="field"><span>菜单栏显示</span><span class="seg" style="background:var(--bg3)"><button data-act="set-mb" data-arg="pct" class="'+(state.menubarShow==='pct'?'on':'')+'">额度 %</button><button data-act="set-mb" data-arg="cost" class="'+(state.menubarShow==='cost'?'on':'')+'">今日 $</button></span></div>'
+ +'<div class="field"><span>刷新间隔</span><select><option>1 分钟</option><option>5 分钟</option><option>10 分钟</option></select></div>'
+ +'<div class="field"><span>同步到 iOS 时项目名脱敏</span><select><option>关闭</option><option>哈希化</option></select></div>'
+ +'<div class="field" style="border:0"><span>外观</span><button class="btn" data-act="theme">'+ico('bulb',15)+' 切换浅/深色</button></div></div>';
+}
+function renderDash(){
+ renderNav();
+ var p=state.dashPanel;
+ var html={overview:panelOverview,claude:panelClaude,codex:panelCodex,projects:panelProjects,models:panelModels,tips:panelTips,settings:panelSettings}[p]();
+ document.getElementById('dash-main').innerHTML=html;
+}
+
+/* ---------- iOS ---------- */
+const IOSTABS=[['home','首页','home'],['trends','趋势','chart'],['tips','建议','bulb'],['settings','设置','settings']];
+function renderIOSTabs(){
+ document.getElementById('ios-tabs').innerHTML=IOSTABS.map(function(t){return '<button class="tabitem '+(state.iosScreen===t[0]?'on':'')+'" data-act="ios-tab" data-arg="'+t[0]+'">'+ico(t[2],19)+t[1]+'</button>';}).join('');
+}
+function iosProvCard(prov){
+ var d=DATA[prov],isC=prov==='claude';
+ return '<div class="card" style="padding:11px 12px;margin-bottom:10px"><div class="row" style="margin-bottom:8px;font-size:13px"><span class="dot" style="width:7px;height:7px;background:'+(isC?'var(--claude)':'var(--codex)')+'"></span><span style="font-weight:500">'+(isC?'Claude':'Codex')+'</span><span class="badge '+(isC?'b-est':'b-auth')+'" style="margin-left:auto">'+(isC?'估算':'权威')+'</span></div>'
+ +'<div class="row" style="gap:16px;justify-content:center"><div style="text-align:center">'+ring(d.w5h,40)+'<div class="muted" style="font-size:11px">5 小时</div></div><div style="text-align:center">'+ring(d.wWeek,40)+'<div class="muted" style="font-size:11px">每周</div></div></div></div>';
+}
+function iosHome(){
+ var today=DATA.claude.today+DATA.codex.today, week=DATA.claude.week+DATA.codex.week;
+ var val=state.iosPeriod==='today'?today:week;
+ return '<div class="row" style="justify-content:space-between;margin-bottom:12px"><span style="font-weight:500;font-size:17px">AI Buddies</span>'+ico('refresh',17,'var(--text2)')+'</div>'
+ +'<div class="seg" style="background:var(--bg3);margin-bottom:14px"><button data-act="ios-period" data-arg="today" class="'+(state.iosPeriod==='today'?'on':'')+'" style="flex:1">今日</button><button data-act="ios-period" data-arg="week" class="'+(state.iosPeriod==='week'?'on':'')+'" style="flex:1">本周</button></div>'
+ +'<div style="text-align:center;margin-bottom:14px"><div class="muted" style="font-size:12px">'+(state.iosPeriod==='today'?'今日':'本周')+'等效费用</div><div style="font-size:30px;font-weight:500">'+usd(val)+'</div></div>'
+ +iosProvCard('claude')+iosProvCard('codex')
+ +'<div style="display:flex;gap:7px;align-items:flex-start;background:var(--warn-bg);padding:9px 11px;border-radius:var(--radius)"><span style="color:var(--warn)">'+ico('bulb',15)+'</span><span style="font-size:12px;color:var(--warn)">Codex 快到 5 小时上限，先缓一缓。</span></div>';
+}
+function iosTrends(){
+ var data=DATA.daily.slice(-7);var max=0;data.forEach(function(d){max=Math.max(max,d[0]+d[1]);});
+ var bars=data.map(function(d){return '<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end"><div style="height:'+Math.round(d[0]/max*70)+'px;background:var(--claude)"></div><div style="height:'+Math.round(d[1]/max*70)+'px;background:var(--codex)"></div></div>';}).join('');
+ return '<div style="font-weight:500;margin:4px 0 10px">近 7 天</div><div class="card" style="padding:12px"><div class="bars" style="height:78px;gap:6px">'+bars+'</div></div>'
+ +'<div class="card" style="margin-top:10px;padding:6px 12px">'+data.map(function(d,i){return '<div class="field" style="font-size:13px"><span class="muted">第 '+(i+1)+' 天</span><span>'+usd(d[0]+d[1])+'</span></div>';}).join('')+'</div>';
+}
+function iosTips(){return '<div style="font-weight:500;margin:4px 0 10px">建议</div>'+DATA.tips.map(function(t){return '<div class="card" style="padding:10px 12px;margin-bottom:8px"><div class="tip"><span class="badge b-'+t.k+'">'+t.c+'</span><span style="font-size:13px">'+t.t+'</span></div></div>';}).join('');}
+function iosSettings(){return '<div style="font-weight:500;margin:4px 0 10px">设置</div><div class="card"><div class="field"><span>Claude 套餐</span><span class="muted">Max 20x</span></div><div class="field"><span>Codex 套餐</span><span class="muted">Pro</span></div><div class="field"><span>通知（接近上限）</span><span class="muted">开</span></div><div class="field"><span>首页默认</span><span class="seg" style="background:var(--bg3)"><button data-act="set-ios" data-arg="today" class="'+(state.iosPeriod==='today'?'on':'')+'">今日</button><button data-act="set-ios" data-arg="week" class="'+(state.iosPeriod==='week'?'on':'')+'">本周</button></span></div><div class="field" style="border:0"><span>外观</span><button class="btn" data-act="theme">浅 / 深</button></div></div>';}
+function renderIOS(){
+ renderIOSTabs();
+ document.getElementById('ios-screen').innerHTML={home:iosHome,trends:iosTrends,tips:iosTips,settings:iosSettings}[state.iosScreen]();
+}
+function renderWidgets(){
+ var c=DATA.claude,x=DATA.codex;
+ document.getElementById('widgets').innerHTML=
+  '<div class="widget" data-act="widget" style="width:118px;height:118px;display:flex;flex-direction:column"><div class="row" style="font-size:11px;margin-bottom:4px"><span class="dot" style="width:6px;height:6px;background:var(--codex)"></span><span style="font-weight:500">Codex</span></div><div class="row" style="gap:6px;margin:auto 0;justify-content:center">'+ring(x.w5h,42)+ring(x.wWeek,42)+'</div><div class="muted" style="font-size:10px;text-align:center">5h · 每周</div></div>'
+  +'<div class="widget" data-act="widget" style="width:246px;height:118px;display:flex;flex-direction:column"><div class="row" style="justify-content:space-between;font-size:11px"><span style="font-weight:500">AI Buddies</span><span class="muted">今日 '+usd(c.today+x.today)+'</span></div><div class="row" style="gap:14px;margin:auto 0">'
+   +'<div style="flex:1"><div style="font-size:11px" class="row" style="gap:4px"><span class="dot" style="width:6px;height:6px;background:var(--claude)"></span>Claude</div><div class="muted" style="font-size:11px;margin:3px 0">5h <span style="color:var(--text)">'+c.w5h+'%</span></div><span class="track"><span style="width:'+c.w5h+'%;background:'+lvlColor(c.w5h)+'"></span></span></div>'
+   +'<div style="flex:1"><div style="font-size:11px" class="row" style="gap:4px"><span class="dot" style="width:6px;height:6px;background:var(--codex)"></span>Codex</div><div class="muted" style="font-size:11px;margin:3px 0">5h <span style="color:var(--text)">'+x.w5h+'%</span></div><span class="track"><span style="width:'+x.w5h+'%;background:'+lvlColor(x.w5h)+'"></span></span></div></div>'
+   +'<div style="font-size:10.5px;color:var(--warn)">'+ico('bulb',12)+' Codex 接近上限，缓一缓</div></div>';
+ document.getElementById('lockwidgets').innerHTML=ring(x.w5h,46,'X 5h')+ring(c.w5h,46,'C 5h')+'<span class="muted" style="font-size:12px">一眼看两端额度</span>';
+}
+
+/* ---------- events ---------- */
+function applyTheme(){document.documentElement.setAttribute('data-theme',state.theme);document.getElementById('themelbl').textContent=state.theme==='dark'?'浅色':'深色';}
+function scrollTo(id){document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'});}
+document.addEventListener('click',function(e){
+ var el=e.target.closest('[data-act]');if(!el)return;
+ var act=el.getAttribute('data-act'),arg=el.getAttribute('data-arg');
+ switch(act){
+  case 'nav':document.querySelectorAll('.proto .seg button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-arg')===arg);});scrollTo(arg);break;
+  case 'theme':state.theme=state.theme==='dark'?'light':'dark';applyTheme();break;
+  case 'mb-toggle':state.ddOpen=!state.ddOpen;renderDropdown();break;
+  case 'mb-refresh':renderDropdown();var b=el;break;
+  case 'mb-settings':state.popover=!state.popover;renderDropdown();break;
+  case 'mb-open':document.querySelectorAll('.proto .seg button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-arg')==='s-dashboard');});scrollTo('s-dashboard');break;
+  case 'mb-prov':state.dashPanel=arg;renderDash();scrollTo('s-dashboard');break;
+  case 'dash-panel':state.project=null;state.dashPanel=arg;renderDash();break;
+  case 'dash-range':state.range=parseInt(arg);renderDash();break;
+  case 'dash-project':state.dashPanel='projects';state.project=arg;renderDash();break;
+  case 'dash-back':state.project=null;renderDash();break;
+  case 'ios-tab':state.iosScreen=arg;renderIOS();break;
+  case 'ios-period':state.iosPeriod=arg;renderIOS();break;
+  case 'set-mb':state.menubarShow=arg;renderStatus();renderDropdown();renderDash();break;
+  case 'set-ios':state.iosPeriod=arg;renderIOS();break;
+  case 'widget':document.querySelectorAll('.proto .seg button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-arg')==='s-ios');});scrollTo('s-ios');break;
+ }
+});
+/* boot */
+document.querySelectorAll('[data-i]').forEach(function(s){var n=s.getAttribute('data-i');s.innerHTML='<svg viewBox="0 0 24 24">'+(ICONS[n]||'')+'</svg>';});
+applyTheme();renderStatus();renderDropdown();renderDash();renderIOS();renderWidgets();
+</script>

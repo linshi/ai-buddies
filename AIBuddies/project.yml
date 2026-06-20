@@ -1,0 +1,111 @@
+name: AIBuddies
+options:
+  bundleIdPrefix: com.example
+  deploymentTarget:
+    macOS: "14.0"
+    iOS: "17.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+
+configFiles:
+  Debug: Config.xcconfig
+  Release: Config.xcconfig
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
+    MARKETING_VERSION: $(MARKETING_VERSION)
+    CURRENT_PROJECT_VERSION: $(CURRENT_PROJECT_VERSION)
+    CODE_SIGN_STYLE: Automatic
+  configs:
+    Debug:
+      CODE_SIGN_IDENTITY: Apple Development
+    Release:
+      CODE_SIGN_IDENTITY: Apple Development
+
+packages:
+  UsageCore:
+    path: Packages/UsageCore
+
+targets:
+  AIBuddiesMac:
+    type: application
+    platform: macOS
+    sources:
+      - path: Apps/AIBuddiesMac
+      - path: Shared
+    dependencies:
+      - package: UsageCore
+        product: UsageCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_BUNDLE_ID_MAC)
+        PRODUCT_NAME: AI Buddies
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGN_ENTITLEMENTS: Apps/AIBuddiesMac/AIBuddiesMac.entitlements
+        ENABLE_HARDENED_RUNTIME: YES
+        INFOPLIST_KEY_CFBundleDisplayName: AI Buddies
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
+        INFOPLIST_KEY_LSUIElement: NO
+        INFOPLIST_KEY_NSHumanReadableCopyright: "Copyright © 2026"
+        ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS: NO
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+      configs:
+        Debug:
+          CODE_SIGN_IDENTITY: Apple Development
+        Release:
+          CODE_SIGN_IDENTITY: Apple Development
+
+  AIBuddiesiOS:
+    type: application
+    platform: iOS
+    sources:
+      - path: Apps/AIBuddiesiOS
+      - path: Shared
+    dependencies:
+      - package: UsageCore
+        product: UsageCore
+      - target: AIBuddiesWidgets
+        embed: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_BUNDLE_ID_IOS)
+        PRODUCT_NAME: AI Buddies
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGN_ENTITLEMENTS: Apps/AIBuddiesiOS/AIBuddiesiOS.entitlements
+        INFOPLIST_KEY_CFBundleDisplayName: AI Buddies
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS: NO
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+      configs:
+        Debug:
+          CODE_SIGN_IDENTITY: Apple Development
+        Release:
+          CODE_SIGN_IDENTITY: Apple Development
+
+  AIBuddiesWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Apps/AIBuddiesWidgets
+      - path: Shared
+    dependencies:
+      - package: UsageCore
+        product: UsageCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_BUNDLE_ID_WIDGETS)
+        PRODUCT_NAME: AIBuddiesWidgets
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: Apps/AIBuddiesWidgets/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Apps/AIBuddiesWidgets/AIBuddiesWidgets.entitlements
+        SKIP_INSTALL: YES
+      configs:
+        Debug:
+          CODE_SIGN_IDENTITY: Apple Development
+        Release:
+          CODE_SIGN_IDENTITY: Apple Development

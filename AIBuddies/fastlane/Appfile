@@ -1,0 +1,9 @@
+# AI Buddies - fastlane account config.
+apple_id(ENV.fetch("FASTLANE_APPLE_ID", "YOUR_APPLE_ID@example.com"))
+
+# Default app identifier (iOS). Mac/Widget overridden per lane.
+app_identifier(ENV.fetch("FASTLANE_APP_IDENTIFIER", "com.example.aibuddies"))
+
+# Fill in once provided (developer.apple.com → Membership):
+#   team_id("XXXXXXXXXX")          # Apple Developer Team ID (also goes in Config.xcconfig)
+#   itc_team_id("XXXXXXXX")        # App Store Connect team id (only if multiple teams)

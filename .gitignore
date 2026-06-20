@@ -1,0 +1,71 @@
+# Seeded by Claude SessionStart hook (~/.claude/hooks/ensure-gitignore.sh).
+# Edit freely — the hook never touches an existing .gitignore.
+
+# macOS / OS junk
+.DS_Store
+Thumbs.db
+.Spotlight-V100
+.Trashes
+
+# Editors / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Env / secrets
+.env
+.env.local
+.env.*.local
+.env.asc
+*.p8
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node / web
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.next/
+dist/
+build/
+
+# Rust / Go
+target/
+*.exe
+*.out
+
+# iOS / Xcode
+DerivedData/
+*.xcarchive/
+*.ipa
+*.dSYM/
+*.xcuserdatad/
+*.xcuserstate
+xcuserdata/
+.swiftpm/
+.build/
+AIBuddies/build/
+AIBuddies/AIBuddies.xcodeproj/
+AIBuddies/Packages/UsageCore/.build/
+
+# Logs / caches / tmp
+*.log
+*.tmp
+.cache/
+*.pid
+usage_snapshot.json
+AIBuddies/fastlane/report.xml
+
+# Claude scratch
+.playwright-mcp/

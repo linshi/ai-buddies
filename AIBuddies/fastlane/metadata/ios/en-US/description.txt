@@ -1,0 +1,10 @@
+AI Buddies is a usage monitor and optimization coach for heavy users of Claude Code and Codex. It reads the usage data the official CLIs write locally and unifies token counts, equivalent cost, 5-hour and weekly quota windows, and per-project / per-model breakdowns — plus actionable tips to save money and avoid rate limits.
+
+• One place for both: see Claude and Codex usage side by side
+• Quota windows: Codex authoritative remaining % + reset countdown; Claude usage-proxy estimate (clearly labeled)
+• Equivalent cost: estimate "what it would have cost" by token, to judge if your subscription is worth it
+• Coaching: flags expensive models on tiny tasks, low cache hit rate, approaching limits, and more
+• Privacy first: data stays on your machine by default; iOS syncs via your private iCloud — never your code or conversations
+• macOS menu bar + dashboard; iOS app + home/lock-screen widgets; local alerts near limits
+
+Note: AI Buddies never signs into your AI accounts. It only reads the usage artifacts the official CLIs write locally.
