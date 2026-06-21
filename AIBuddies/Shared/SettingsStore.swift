@@ -7,6 +7,25 @@ final class SettingsStore: ObservableObject {
     enum ClaudePlan: String, CaseIterable, Identifiable {
         case pro = "Pro", max5 = "Max 5x", max20 = "Max 20x"
         var id: String { rawValue }
+
+        /// Soft monthly equivalent budget used only to turn Claude's local token
+        /// usage into an estimated ring. Claude Code does not expose official
+        /// quota percentages in local JSONL files.
+        var monthlyEquivalentBudgetUSD: Double {
+            switch self {
+            case .pro: return 20
+            case .max5: return 100
+            case .max20: return 200
+            }
+        }
+
+        var fiveHourEquivalentCeilingUSD: Double {
+            monthlyEquivalentBudgetUSD * (5.0 / (30.0 * 24.0))
+        }
+
+        var weeklyEquivalentCeilingUSD: Double {
+            monthlyEquivalentBudgetUSD * (7.0 / 30.0)
+        }
     }
     enum CodexPlan: String, CaseIterable, Identifiable {
         case plus = "Plus", pro = "Pro"

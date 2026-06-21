@@ -238,6 +238,27 @@ final class UsageCoreTests: XCTestCase {
         XCTAssertEqual(Pricing.claudeFamily("mystery-model"), "sonnet")  // default
     }
 
+    func testSnapshotBuildUsesClaudeCeilingsForEstimatedRings() {
+        let claude = ClaudeParser.scan(directories: [claudeDir()])
+        let snapshot = SnapshotBuilder.build(
+            .init(
+                claudeEvents: claude.events,
+                codexEvents: [],
+                codexRateLimit: nil,
+                claudeFiveHourCeilingUSD: 1,
+                claudeWeeklyCeilingUSD: 2
+            ),
+            now: now
+        )
+
+        let five = snapshot.windows.first { $0.provider == .claude && $0.kind == .fiveHour }
+        let week = snapshot.windows.first { $0.provider == .claude && $0.kind == .weekly }
+        XCTAssertEqual(five?.isEstimated, true)
+        XCTAssertEqual(five?.usedPercent ?? 0, 2.09, accuracy: 1e-6)
+        XCTAssertEqual(week?.isEstimated, true)
+        XCTAssertEqual(week?.usedPercent ?? 0, 1.045, accuracy: 1e-6)
+    }
+
     func testFormatting() {
         XCTAssertEqual(Formatting.usd(1234.5), "$1,234.50")
         XCTAssertEqual(Formatting.humanDuration(3900), "1小时5分")

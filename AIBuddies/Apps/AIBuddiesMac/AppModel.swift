@@ -33,6 +33,10 @@ final class AppModel: ObservableObject {
             .debounce(for: .milliseconds(400), scheduler: RunLoop.main)
             .sink { [weak self] _ in Task { await self?.refresh() } }
             .store(in: &cancellables)
+        settings.$claudePlan
+            .dropFirst()
+            .sink { [weak self] _ in Task { await self?.refresh() } }
+            .store(in: &cancellables)
     }
 
     private let isDemo = ProcessInfo.processInfo.environment["AIBUDDIES_DEMO"] == "1"
@@ -99,6 +103,8 @@ final class AppModel: ObservableObject {
         defer { isRefreshing = false }
 
         let planPrice = settings.planPriceUSD
+        let claudeFiveHourCeiling = settings.claudePlan.fiveHourEquivalentCeilingUSD
+        let claudeWeeklyCeiling = settings.claudePlan.weeklyEquivalentCeilingUSD
         let folders = self.folders
         let snap = await Task.detached(priority: .utility) {
             folders.withAccess { claudeDirs, codexDir -> Snapshot in
@@ -109,7 +115,9 @@ final class AppModel: ObservableObject {
                     codexEvents: codex?.events ?? [],
                     codexRateLimit: codex?.rateLimit,
                     subagentSuspect: codex?.subagentSuspect ?? 0,
-                    planPriceUSD: planPrice
+                    planPriceUSD: planPrice,
+                    claudeFiveHourCeilingUSD: claudeFiveHourCeiling,
+                    claudeWeeklyCeilingUSD: claudeWeeklyCeiling
                 ))
             }
         }.value
